@@ -1,8 +1,8 @@
-# Fixes para apps en macOS Sequoia (OCLP / GPUs legacy)
+# Fixes for apps on macOS Sequoia (OCLP / legacy GPUs)
 
-Parches para Macs no soportados oficialmente que corren macOS Sequoia vía OpenCore Legacy Patcher.
+Patches for unsupported Macs running macOS Sequoia via OpenCore Legacy Patcher.
 
-| Fix | Problema |
+| Fix | Problem |
 | --- | --- |
-| [fix-filmcraft](fix-filmcraft/) | FilmCraft / ArtCraft abortan al abrir (`abort trap: 6` / `Parent device is lost`) |
-| [fix-godot](fix-godot/) | Godot 4 dibuja popups y diálogos en negro |
+| [fix-filmcraft](fix-filmcraft/) | FilmCraft / ArtCraft apps crash on launch (`abort trap: 6` / `Parent device is lost`) |
+| [fix-godot](fix-godot/) | Godot 4 renders popups and dialogs black |

@@ -1,34 +1,36 @@
-# Fix para FilmCraft y ArtCraft Apps en macOS Sequoia (OCLP / GPUs Legacy)
+# Fix for the ArtCraft Suite on macOS Sequoia (OCLP / legacy GPUs)
 
-Este fix resuelve el problema de choque (`SIGABRT` / `abort trap: 6` / `Parent device is lost`) al abrir **FilmCraft.app**, **ArtCraft Launcher.app** y demás aplicaciones de la suite de ArtCraft en Macs no soportados oficialmente que corren **macOS Sequoia** mediante **OpenCore Legacy Patcher (OCLP)** (como MacBooks con gráficos Intel Iris Pro o NVIDIA GeForce GT 750M / Kepler).
-
----
-
-## Causa del error
-
-Las aplicaciones de ArtCraft están escritas en Rust y utilizan el motor gráfico `wgpu` para sus interfaces (`egui`). En macOS 15 (Sequoia), `wgpu` asume por defecto soporte para el estándar **Metal 3.2** (`-std=metal3.2`). En GPUs con drivers legacy parcheados por OCLP, el compilador de Metal rechaza ese estándar, provocando que la aplicación aborte de inmediato al inicializar la ventana gráfica (`egui_pipeline` o `ComputePipeline`).
+This fix resolves the crash (`SIGABRT` / `abort trap: 6` / `Parent device is lost`) that occurs when launching **any app from the ArtCraft suite** (`FilmCraft.app`, `ArtCraft Launcher.app`, `PhotoCraft.app`, etc.) on Macs not officially supported by macOS 15, running **macOS Sequoia** via **OpenCore Legacy Patcher (OCLP)** (e.g. MacBooks with Intel Iris Pro or NVIDIA GeForce GT 750M / Kepler GPUs).
 
 ---
 
-## ¿Qué hace este script?
+## Root cause
 
-Para cada aplicación instalada (**FilmCraft**, **ArtCraft Launcher**, **PhotoCraft**, etc.):
-1. **Limpia la cuarentena:** Quita los atributos `com.apple.quarantine` de Gatekeeper que macOS le asigna a las descargas web.
-2. **Inyecta `SYSTEM_VERSION_COMPAT=1`:** Agrega la clave `LSEnvironment` en `Contents/Info.plist`, lo que indica a macOS que informe una versión de API compatible sin solicitar Metal 3.2.
-3. **Refresca LaunchServices:** Notifica al sistema para que registre inmediatamente los cambios.
+The ArtCraft apps are written in Rust and use the `wgpu` graphics engine for their UIs (`egui`). On macOS 15 (Sequoia), `wgpu` assumes support for the **Metal 3.2** standard (`-std=metal3.2`) by default. On legacy GPUs with OCLP-patched drivers, the Metal compiler rejects that standard, causing the app to abort immediately when initializing the graphics window (`egui_pipeline` or `ComputePipeline`).
 
 ---
 
-## Cómo usarlo tras una actualización o nueva instalación
+## What this script does
 
-Cada vez que descargues una nueva versión o una nueva app de ArtCraft y la copies en `/Applications`, simplemente ejecutás en tu terminal:
+It scans `/Applications` and patches **every ArtCraft suite app it finds** (anything with a bundle id starting with `ai.storyteller.` or a name ending in `Craft.app`). For each one it:
+
+1. **Clears quarantine:** removes the `com.apple.quarantine` attributes Gatekeeper assigns to web downloads.
+2. **Injects `SYSTEM_VERSION_COMPAT=1`:** adds the `LSEnvironment` key to `Contents/Info.plist`, telling macOS to report a compatible API version instead of requesting Metal 3.2.
+3. **Re-signs the bundle ad-hoc:** so AMFI doesn't kill the process due to the modified `Info.plist`.
+4. **Refreshes LaunchServices:** notifies the system to register the changes immediately.
+
+---
+
+## How to use it after an update or fresh install
+
+Whenever you download a new version — or a new ArtCraft app — and copy it into `/Applications`, just run in your terminal:
 
 ```bash
 cd "/Users/albertmac11/Downloads/fixes-crash-apps/fix-filmcraft"
 ./fix-filmcraft.sh
 ```
 
-O directamente ejecutando la ruta completa:
+Or by full path:
 
 ```bash
 /Users/albertmac11/Downloads/fixes-crash-apps/fix-filmcraft/fix-filmcraft.sh
@@ -36,9 +38,9 @@ O directamente ejecutando la ruta completa:
 
 ---
 
-## Opcional: Tener el comando siempre a mano en tu terminal
+## Optional: keep the command always at hand
 
-Si querés poder ejecutar `fix-filmcraft` desde cualquier lugar:
+If you want to run `fix-filmcraft` from anywhere:
 
 ```bash
 cp fix-filmcraft.sh ~/.local/bin/fix-filmcraft

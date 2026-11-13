@@ -1,38 +1,38 @@
-# Fix para Godot en macOS Sequoia (OCLP / GPUs Legacy)
+# Fix for Godot on macOS Sequoia (OCLP / legacy GPUs)
 
-Este fix resuelve el problema de las **subventanas, popups y diálogos que se muestran completamente en negro** al abrir o utilizar **Godot 4** en Macs con gráficos legacy (Intel Iris Pro / NVIDIA Kepler) corriendo **macOS Sequoia** mediante **OpenCore Legacy Patcher (OCLP)**.
-
----
-
-## Causa del error
-
-1. **Bug de composición multi-ventana en macOS Sequoia + OCLP:**  
-   Por defecto, Godot 4 intenta abrir cada diálogo (como "Importar", "Escanear", "Nuevo Proyecto", configuración o menús flotantes) como una **ventana nativa separada (`NSWindow`)**. El compositor de ventanas de macOS falla al sincronizar los contextos OpenGL secundarios de las GPUs legacy, provocando que la ventana secundaria se dibuje como un rectángulo negro sólido.
-2. **Incompatibilidad de MoltenVK (Metal 3.2):**  
-   Al intentar inicializar Vulkan/MoltenVK, el motor solicita estándares de Metal que las GPUs anteriores a 2016 no soportan.
+This fix resolves the problem of **subwindows, popups and dialogs rendering completely black** when opening or using **Godot 4** on Macs with legacy graphics (Intel Iris Pro / NVIDIA Kepler) running **macOS Sequoia** via **OpenCore Legacy Patcher (OCLP)**.
 
 ---
 
-## ¿Qué hace este script?
+## Root cause
 
-1. **Inyecta `--single-window`:** Configura un wrapper dentro de `Godot.app/Contents/MacOS/Godot` para que el Administrador de Proyectos y el Editor siempre arranquen con `--single-window`, forzando a que todos los diálogos se dibujen incrustados en el lienzo de la ventana principal y nunca creen ventanas secundarias negras.
-2. **Habilita `single_window_mode` en la configuración de usuario:** Actualiza los archivos `editor_settings-*.tres` en `~/Library/Application Support/Godot/`.
-3. **Inyecta `SYSTEM_VERSION_COMPAT=1`:** Evita los errores de validación de shaders de Metal 3.2 en MoltenVK.
-4. **Remueve cuarentena de Gatekeeper y re-firma ad-hoc:** Garantiza que macOS abra la aplicación sin advertencias ni bloqueos de AMFI.
+1. **Multi-window composition bug on macOS Sequoia + OCLP:**
+   By default, Godot 4 tries to open each dialog ("Import", "Scan", "New Project", settings, or floating menus) as a **separate native window (`NSWindow`)**. The macOS window compositor fails to synchronize the secondary OpenGL contexts on legacy GPUs, causing the secondary window to render as a solid black rectangle.
+2. **MoltenVK (Metal 3.2) incompatibility:**
+   When trying to initialize Vulkan/MoltenVK, the engine requests Metal standards that pre-2016 GPUs don't support.
 
 ---
 
-## Cómo usarlo tras actualizar Godot
+## What this script does
 
-Cada vez que descargues una nueva versión de Godot (por ejemplo Godot 4.8 o una actualización de mantenimiento) y la reemplaces en `/Applications/Godot.app`:
+1. **Injects `--single-window`:** configures a wrapper inside `Godot.app/Contents/MacOS/Godot` so that the Project Manager and the Editor always launch with `--single-window`, forcing all dialogs to be drawn embedded in the main window's canvas and never create black secondary windows.
+2. **Enables `single_window_mode` in the user settings:** updates the `editor_settings-*.tres` files in `~/Library/Application Support/Godot/`.
+3. **Injects `SYSTEM_VERSION_COMPAT=1`:** avoids Metal 3.2 shader validation errors in MoltenVK.
+4. **Removes Gatekeeper quarantine and re-signs ad-hoc:** ensures macOS opens the application without warnings or AMFI blocks.
 
-### Opción A (desde la terminal en cualquier lugar):
+---
+
+## How to use it after updating Godot
+
+Whenever you download a new version of Godot (for example Godot 4.8 or a maintenance update) and replace it in `/Applications/Godot.app`:
+
+### Option A (from the terminal, anywhere):
 ```bash
 fix-godot
 ```
 
-### Opción B (desde esta carpeta):
+### Option B (from this folder):
 ```bash
-cd "/Users/albertmac11/Downloads/filmcraft-cli-0.6.0-macos-universal/fix-godot"
+cd "/Users/albertmac11/Downloads/fixes-crash-apps/fix-godot"
 ./fix-godot.sh
 ```
