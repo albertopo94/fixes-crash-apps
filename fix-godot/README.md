@@ -33,6 +33,6 @@ fix-godot
 
 ### Option B (from this folder):
 ```bash
-cd "/Users/albertmac11/Downloads/fixes-crash-apps/fix-godot"
+cd fixes-crash-apps/fix-godot
 ./fix-godot.sh
 ```

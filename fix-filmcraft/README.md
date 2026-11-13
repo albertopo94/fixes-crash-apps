@@ -26,14 +26,14 @@ It scans `/Applications` and patches **every ArtCraft suite app it finds** (anyt
 Whenever you download a new version — or a new ArtCraft app — and copy it into `/Applications`, just run in your terminal:
 
 ```bash
-cd "/Users/albertmac11/Downloads/fixes-crash-apps/fix-filmcraft"
+cd fixes-crash-apps/fix-filmcraft
 ./fix-filmcraft.sh
 ```
 
-Or by full path:
+Or from the repository root:
 
 ```bash
-/Users/albertmac11/Downloads/fixes-crash-apps/fix-filmcraft/fix-filmcraft.sh
+./fix-filmcraft/fix-filmcraft.sh
 ```
 
 ---
